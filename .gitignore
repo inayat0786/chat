@@ -1,3 +1,29 @@
+# Xcode
+#
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Android/IntelliJ
+#
+build/
+.idea
+.gradle
+local.properties
+*.iml
 # Logs
 logs
 *.log
@@ -96,6 +122,15 @@ dist
 
 # FuseBox cache
 .fusebox/
+# CocoaPods
+/ios/Pods/
+android/java_pid20011.hprof
+/android/java_pid20011.hprof
+android/app/Mind.jks
+android/app/build
+android/app/release
+/android/app/build
+/android/app/release
 
 # DynamoDB Local files
 .dynamodb/
