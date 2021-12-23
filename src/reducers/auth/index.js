@@ -1,11 +1,12 @@
-import { SET_IMAGES, LOGIN, LOGOUT, SET_LOADER, RETRIEVE_TOKEN } from '../../types/auth';
+import { SET_IMAGES, LOGIN, LOGOUT, SET_LOADER, RETRIEVE_TOKEN,CALL } from '../../types/auth';
 const initialState = {
 
     images: null,
     isLoading: true,
     userName: null,
     userToken: null,
-    loader: false
+    loader: false,
+    call:false
 }
 const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -35,6 +36,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 userToken: action.token,
                 isLoading: false,
+            };
+          case CALL:
+            return {
+                ...state,
+                call: action.value,
             };
         default:
             return state;

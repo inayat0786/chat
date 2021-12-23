@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {GiftedChat, re} from 'react-native-gifted-chat';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TouchableOpacity, Text, Platform} from 'react-native';
@@ -53,13 +53,11 @@ export function Chat(props: any) {
     };
   };
 
-  const onSend = async (messageArray, image) => {
-    const msg = {
-      text: '',
-      image: image,
-    };
-    console.log('message', msg);
+  const onSend = async messageArray => {
+    console.log('messageArray', messageArray);
+    const msg = messageArray[0];
     let mymsg: any;
+    console.log('message', msg);
     await firestore()
       .collection('users')
       .where('email', '==', userId)
@@ -175,30 +173,31 @@ export function Chat(props: any) {
   return (
     <GiftedChat
       messages={messages}
-      onSend={messages => onSend(messages, img)}
+      onSend={messages => onSend(messages)}
       user={{
         _id: userId,
       }}
-      renderActions={() => (
-        <React.Fragment>
-          <TouchableOpacity
-            onPress={() => {
-              getImages();
-            }}
-            style={{
-              backgroundColor: 'gray',
-              padding: 10,
-              borderRadius: 5,
-              marginHorizontal: 10,
-            }}>
-            <Text style={{color: '#fff'}}>Image</Text>
-          </TouchableOpacity>
-          {/* <ImgPicker setmsgImgUrl={this.setmsgImgUrl} /> */}
-        </React.Fragment>
-      )}
-      renderSend={customSend}
+      // renderActions={() => (
+      //   <React.Fragment>
+      //     <TouchableOpacity
+      //       onPress={() => {
+      //         getImages();
+      //       }}
+      //       style={{
+      //         backgroundColor: 'gray',
+      //         padding: 10,
+      //         borderRadius: 5,
+      //         marginHorizontal: 10,
+      //       }}>
+      //       <Text style={{color: '#fff'}}>Image</Text>
+      //     </TouchableOpacity>
+      //     {/* <ImgPicker setmsgImgUrl={this.setmsgImgUrl} /> */}
+      //   </React.Fragment>
+      // )}
+      // renderSend={customSend}
       alwaysShowSend
-      messageIdGenerator={() => 'hhvh'}
+      // renderTicks={message => setMessages(message)}
+      // messageIdGenerator={() => 'hhvh'}
       // videoProps
     />
   );

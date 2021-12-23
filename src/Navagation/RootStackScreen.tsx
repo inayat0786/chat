@@ -5,7 +5,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import SplashScreen from '../screens/splashScreen';
 import SignInScreen from '../screens/auth/login';
 import SignUpScreen from '../screens/auth/signup';
-
 const RootStack = createStackNavigator();
 
 const RootStackScreen = ({navigation}) => (

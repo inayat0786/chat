@@ -5,3 +5,5 @@ export const LOGOUT = "LOGOUT ";
 export const REGISTER = "REGISTER ";
 export const SET_LOADER = "SET_LOADER ";
 export const USER_DATA = "USER_DATA ";
+export const CALL = "CALL ";
+

@@ -18,7 +18,6 @@ import {useSelector, useDispatch} from 'react-redux';
 import {LOGOUT} from '../types/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {AuthContext} from '../../components/context';
 export function DrawerContent(props) {
   const userData = useSelector((state: any) => state.user.data);
@@ -120,6 +119,15 @@ export function DrawerContent(props) {
               label="Profile"
               onPress={() => {
                 props.navigation.navigate('Profile');
+              }}
+            />
+            <DrawerItem
+              icon={({color, size}) => (
+                <Icon name="account-outline" color={color} size={size} />
+              )}
+              label="SignUpScreen"
+              onPress={() => {
+                props.navigation.navigate('signup');
               }}
             />
           </Drawer.Section>

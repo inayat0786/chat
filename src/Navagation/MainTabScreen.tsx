@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Alert, Vibration} from 'react-native';
+import {Alert, Vibration, Platform} from 'react-native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import firebase from 'react-native-firebase';
@@ -7,14 +7,21 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import messaging from '@react-native-firebase/messaging';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/profile/index';
+import Voice from '../screens/VoiceCall';
+import signup from '../screens/signUp/index';
+import Home from '../screens/Home';
 import notifee from '@notifee/react-native';
 import Groups from '../screens/groupChat';
 import Chat from '../screens/groupChat/chat';
-
+import CallScreen from '../screens/callScreen';
+import Tree from '../Archive/App';
 const HomeStack = createStackNavigator();
 const DetailsStack = createStackNavigator();
 import gallery from '../screens/gallery';
-
+import {setCall} from '../actions/auth';
+import {useSelector, useDispatch} from 'react-redux';
+// @ts-ignore
+import RNVoipCall from 'react-native-voip-call';
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
@@ -27,6 +34,8 @@ const ChatScreen = ({navigation}) => (
 );
 
 const MainTabScreen = ({navigation}) => {
+  const dispatch = useDispatch();
+
   async function onDisplayNotification() {
     const channelId = await notifee.createChannel({
       id: 'default',
@@ -58,17 +67,102 @@ const MainTabScreen = ({navigation}) => {
       },
     });
   }
-
+  const getCall = (remoteMessage: any) => {
+    if (Platform.OS === 'android') {
+      let data;
+      if (remoteMessage.data) {
+        data = remoteMessage.data;
+      }
+      if (data && data.type === 'call' && data.uuid) {
+        let callOptions = {
+          callerId: data.uuid, // Important uuid must in this format
+          ios: {
+            phoneNumber: '12344', // Caller Mobile Number
+            name: data.name, // caller Name
+            hasVideo: true,
+          },
+          android: {
+            ringtuneSound: true, // defualt true
+            ringtune: 'ringtune', // add file inside Project_folder/android/app/res/raw --Formats--> mp3,wav
+            duration: 30000, // defualt 30000
+            vibration: true, // defualt is true
+            channel_name: 'call', //
+            notificationId: 1123,
+            notificationTitle: 'Incomming Call',
+            notificationBody: data.name + ' is Calling...',
+            answerActionTitle: 'Answer',
+            declineActionTitle: 'Decline',
+          },
+        };
+        RNVoipCall.displayIncomingCall(callOptions)
+          .then(data => {
+            console.log('----------------', data);
+          })
+          .catch(e => console.log(e));
+        RNVoipCall.onCallAnswer(data => {
+          dispatch(
+            setCall(true, (callBack: any) => {
+              callBack && navigation.navigate('Profile');
+            }),
+          );
+          // let Newdata = JSON.parse(data);
+          RNVoipCall.stopRingtune();
+          // RNVoipCall.endAllCalls();
+          RNVoipCall.endCall(0);
+          console.log('---------------', data);
+        });
+      }
+    }
+  };
   useEffect(() => {
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('Message handled in the background---------!', remoteMessage);
+      getCall(remoteMessage);
+    });
+
     // onDisplayNotification()
     requestUserPermission();
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('checking----------', JSON.stringify(remoteMessage));
+      // console.log('checking----------', JSON.stringify(remoteMessage));
+      // dispatch(
+      //   setCall(true, (callBack: any) => {
+      //     console.log('call bacj', callBack);
+      //     callBack && navigation.navigate('Profile');
+      //   }),
+      // );
+      getCall(remoteMessage);
     });
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      // onDisplayNotification()
-      // onDisplayNotification()
-      console.log('Message handled in the background!innu', remoteMessage);
+    // messaging().setBackgroundMessageHandler(async remoteMessage => {
+    //   console.log('Message handled in the background!innu', remoteMessage);
+    //   dispatch(
+    //     setCall(true, (callBack: any) => {
+    //       callBack && navigation.navigate('Profile');
+    //     }),
+    //   );
+    // });
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log('!1111111----------------');
+          // dispatch(
+          //   setCall(true, (callBack: any) => {
+          //     callBack && navigation.navigate('Profile');
+          //   }),
+          // );
+        }
+        getCall(remoteMessage);
+      });
+    //background/initial state
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('!1111111----------------vdfbdfbf');
+
+      // dispatch(
+      //   setCall(true, (callBack: any) => {
+      //     callBack && navigation.navigate('Profile');
+      //   }),
+      // );
+      getCall(remoteMessage);
     });
     return unsubscribe;
   }, []);
@@ -88,7 +182,8 @@ const MainTabScreen = ({navigation}) => {
     <Tab.Navigator initialRouteName="Home" activeColor="#fff">
       <Tab.Screen
         name="Home"
-        component={HomeStackScreen}
+        // component={HomeStackScreen}
+        component={Tree}
         options={{
           tabBarLabel: 'Home',
           // tabBarColor: '#009387',
@@ -111,7 +206,7 @@ const MainTabScreen = ({navigation}) => {
     /> */}
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={Voice}
         options={{
           headerShown: true,
           tabBarLabel: 'Profile',
@@ -123,6 +218,25 @@ const MainTabScreen = ({navigation}) => {
         options={{
           tabBarLabel: 'Profile',
           tabBarColor: '#694fad',
+          tabBarIcon: ({color}) => (
+            <Icon name="ios-person" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Signup"
+        component={signup}
+        options={{
+          headerShown: true,
+          tabBarLabel: 'Profile',
+          tabBarColor: '#694fad',
+          tabBarIcon: ({color}) => (
+            <Icon name="ios-person" color={color} size={26} />
+          ),
+        }}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarColor: 'red',
           tabBarIcon: ({color}) => (
             <Icon name="ios-person" color={color} size={26} />
           ),
